@@ -2,6 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Fridge_BackEnd.Data
 {
@@ -67,6 +71,16 @@ namespace Fridge_BackEnd.Data
             });
 
             modelBuilder.Entity<IdentityUserToken<int>>().ToTable("UserTokens");
+
+            var categories = new List<string>();
+            var myJsonString = File.ReadAllText("IngredientCategories.json");
+            var myJObject = JObject.Parse(myJsonString);
+            var obj = myJObject.SelectToken("categories").ToList();
+            var categoriesCount = obj.Count();
+
+            //modelBuilder.Entity<IngredientCategory>().HasData(
+
+            //    new IngredientCategory() { Name = "" });
 
         }
     }

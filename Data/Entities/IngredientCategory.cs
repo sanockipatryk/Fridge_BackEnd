@@ -10,6 +10,8 @@ namespace Fridge_BackEnd.Data.Entities
     {
         [Key]
         public int Id { get; set; }
+        [Required]
+        public string Name { get; set; }
 
         public List<Ingredient> Ingredients { get; set; }
     }

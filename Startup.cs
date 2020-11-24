@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Linq;
 
 namespace Fridge_BackEnd
 {
@@ -96,6 +98,18 @@ namespace Fridge_BackEnd
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+            var categories = new List<string>();
+            var myJsonString = File.ReadAllText("IngredientCategories.json");
+            var myJObject = JObject.Parse(myJsonString);
+            var obj = myJObject.SelectToken("categories").ToList();
+            var categoriesCount = obj.Count();
+            var myJsonString2 = File.ReadAllText("FoodData.json");
+            var myJObject2 = JObject.Parse(myJsonString2);
+            var obj2 = myJObject2.SelectToken("ingredients").ToList();
+            var categoriesCount2 = obj2.Count();
+
+
             app.UseCors(x =>
                 x.AllowAnyOrigin()
                 .AllowAnyMethod()
