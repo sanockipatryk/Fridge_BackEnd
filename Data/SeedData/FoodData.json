@@ -1,4 +1,5 @@
 {
+  "categories": [ "Herbs and Spices", "Vegetables", "Fruits", "Nuts", "Cereals and cereal products", "Pulses", "Teas", "Gourds", "Coffee and coffee products", "Soy", "Cocoa and cocoa products", "Beverages", "Aquatic foods", "Animal foods", "Milk and milk products", "Eggs", "Confectioneries", "Baking goods", "Dishes", "Snack foods", "Baby foods", "Unclassified", "Fats and oils" ],
   "ingredients": [
     {
       "id": 1,
@@ -5938,19 +5939,19 @@
       "id": 1022,
       "name": "Fish oil",
       "description": "Fish oil is oil derived from the tissues of oily fish. Fish oils contain the omega-3 fatty acids eicosapentaenoic acid (EPA) and docosahexaenoic acid (DHA), precursors of certain eicosanoids that are known to reduce inflammation in the body and improve hypertriglyceridemia. Fish oil has been shown the benefit for cardiovascular disease. The most promising evidence supports supplementation for prevention of cardiac death.",
-      "food_group": null
+      "food_group": "Fats and oils"
     },
     {
       "id": 1023,
       "name": "Taco shell",
       "description": "The hard-shell or crispy taco is a tradition that developed in the United States. The most common type of taco in the US is the hard-shell, U-shaped version, first described in a cookbook in 1949.",
-      "food_group": null
+      "food_group": "Cereals and cereal products"
     },
     {
       "id": 1024,
       "name": "Tostada shell",
       "description": null,
-      "food_group": null
+      "food_group": "Cereals and cereal products"
     }
   ]
 }

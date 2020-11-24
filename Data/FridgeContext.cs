@@ -1,11 +1,8 @@
 ﻿using Fridge_BackEnd.Data.Entities;
+using Fridge_BackEnd.Data.SeedData;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace Fridge_BackEnd.Data
 {
@@ -19,8 +16,8 @@ namespace Fridge_BackEnd.Data
         public DbSet<FridgeIngredient> FridgeIngredients { get; set; }
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
-        public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<IngredientCategory> IngredientCategories { get; set; }
+        public DbSet<Ingredient> Ingredients { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -72,16 +69,9 @@ namespace Fridge_BackEnd.Data
 
             modelBuilder.Entity<IdentityUserToken<int>>().ToTable("UserTokens");
 
-            var categories = new List<string>();
-            var myJsonString = File.ReadAllText("IngredientCategories.json");
-            var myJObject = JObject.Parse(myJsonString);
-            var obj = myJObject.SelectToken("categories").ToList();
-            var categoriesCount = obj.Count();
+            modelBuilder.SeedIngredientsCategoriesData();
 
-            //modelBuilder.Entity<IngredientCategory>().HasData(
-
-            //    new IngredientCategory() { Name = "" });
-
+            modelBuilder.SeedFoodIngredientsData();
         }
     }
 }
