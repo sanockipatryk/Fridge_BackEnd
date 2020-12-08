@@ -65,7 +65,11 @@ namespace Fridge_BackEnd.Features.Authentication
             new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.UserName)
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim("UserId", user.Id.ToString()),
+            new Claim("Email", user.Email),
+            new Claim("FirstName", user.FirstName  ),
+            new Claim("LastName", user.LastName  )
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Authentication:JwtKey"]));

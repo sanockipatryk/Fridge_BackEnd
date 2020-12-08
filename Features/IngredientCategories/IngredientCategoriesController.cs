@@ -22,7 +22,6 @@ namespace Fridge_BackEnd.Features.IngredientCategories
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             var ingredientCategories = await _db.IngredientCategories.ToListAsync();
