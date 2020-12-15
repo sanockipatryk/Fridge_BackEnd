@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\FridgeIngredients\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

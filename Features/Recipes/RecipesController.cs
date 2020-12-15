@@ -24,7 +24,7 @@ namespace Fridge_BackEnd.Features.Recipes
 
         [HttpGet("getUserRecipes")]
         [Authorize]
-        public async Task<IActionResult> GetUserFridges()
+        public async Task<IActionResult> GetUserRecipes()
         {
             var appUser = await _db.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
             var userRecipes = await _db.Recipes.Where(f => f.UserId == appUser.Id).Select(i => new RecipesListViewModel
@@ -34,7 +34,13 @@ namespace Fridge_BackEnd.Features.Recipes
                 Description = i.Description,
                 DateCreated = i.DateCreated,
                 DateModified = i.DateModified,
-                CookingTime = i.CookingTime
+                CookingTime = i.CookingTime,
+                Ingredients = i.Ingredients.Select(ing => new RecipeIngredients.RecipeIngredientsListViewModel
+                {
+                    IngredientId = ing.IngredientId,
+                    CategoryId = ing.Ingredient.CategoryId,
+                    Quantity = ing.Quantity
+                }).ToList()
             }).ToListAsync();
 
             return Ok(userRecipes);
@@ -57,12 +63,79 @@ namespace Fridge_BackEnd.Features.Recipes
             _db.Recipes.Add(newRecipe);
             await _db.SaveChangesAsync();
 
-            //var newRecipeIngredients = new RecipeIngredient
-            //{
-                
-            //}
+            var recipeIngredients = new List<RecipeIngredient>();
+            model.Ingredients.ForEach(i => recipeIngredients.Add(new RecipeIngredient
+            {
+                RecipeId = newRecipe.Id,
+                IngredientId = i.IngredientId,
+                Quantity = i.Quantity
+            }));
+
+            _db.RecipeIngredients.AddRange(recipeIngredients);
+            await _db.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [HttpPut("editRecipe")]
+        [Authorize]
+        public async Task<IActionResult> EditRecipe([FromBody] EditRecipeViewModel model)
+        {
+            var appUser = await _db.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            var currentRecipe = await _db.Recipes.FirstOrDefaultAsync(r => r.Id == model.RecipeId);
+            if (currentRecipe != null)
+            {
+                if (appUser.Id != currentRecipe.UserId)
+                    return Unauthorized();
+
+                currentRecipe.Name = model.Name;
+                currentRecipe.Description = model.Description;
+                currentRecipe.CookingTime = model.CookingTime;
+
+                _db.Recipes.Update(currentRecipe);
+                await _db.SaveChangesAsync();
+
+                var currentRecipeIngredients = await _db.RecipeIngredients.Where(ri => ri.RecipeId == model.RecipeId).ToListAsync();
+                _db.RecipeIngredients.RemoveRange(currentRecipeIngredients);
+
+                var recipeIngredients = new List<RecipeIngredient>();
+                model.Ingredients.ForEach(i => recipeIngredients.Add(new RecipeIngredient
+                {
+                    RecipeId = model.RecipeId,
+                    IngredientId = i.IngredientId,
+                    Quantity = i.Quantity
+                }));
+
+                _db.RecipeIngredients.AddRange(recipeIngredients);
+                await _db.SaveChangesAsync();
+
+                return Ok();
+            }
+            else
+                return NotFound();
+        }
+
+        [HttpDelete("deleteRecipe/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteRecipe(int id)
+        {
+            var appUser = await _db.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            var currentRecipe = await _db.Recipes.FirstOrDefaultAsync(r => r.Id == id);
+            if (currentRecipe != null)
+            {
+                if (appUser.Id != currentRecipe.UserId)
+                    return Unauthorized();
+
+                var currentRecipeIngredients = await _db.RecipeIngredients.Where(ri => ri.RecipeId == id).ToListAsync();
+                _db.RecipeIngredients.RemoveRange(currentRecipeIngredients);
+
+                _db.Recipes.Remove(currentRecipe);
+                await _db.SaveChangesAsync();
+
+                return Ok();
+            }
+            else
+                return NotFound();
         }
     }
 }

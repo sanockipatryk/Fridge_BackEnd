@@ -23,7 +23,14 @@ namespace Fridge_BackEnd.Features.Ingredients
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var ingredientCategories = await _db.Ingredients.ToListAsync();
+            var ingredientCategories = await _db.Ingredients.Select(i => new IngredientListViewModel
+            {
+                Id = i.Id,
+                Name = i.Name,
+                Description = i.Description,
+                CategoryId = i.CategoryId,
+                Category = i.IngredientCategory.Name
+            }).OrderBy(i => i.Name).ToListAsync();
             return Ok(ingredientCategories);
         }
     }

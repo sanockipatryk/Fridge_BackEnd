@@ -63,9 +63,45 @@ namespace Fridge_BackEnd.Features.Fridges
             };
 
             _db.FridgeUsers.Add(newFridgeUser);
+
+            if(model.Ingredients.Count > 0) { 
+            var fridgeIngredients = new List<FridgeIngredient>();
+            model.Ingredients.ForEach(i => fridgeIngredients.Add(new FridgeIngredient
+            {
+                FridgeId = newFridge.Id,
+                IngredientId = i.IngredientId,
+                Quantity = i.Quantity
+            }));
+
+            _db.FridgeIngredients.AddRange(fridgeIngredients);
+            }
+
             await _db.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [HttpDelete("deleteFridge/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteFridge(int id)
+        {
+            var appUser = await _db.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            var currentFridge = await _db.Fridges.FirstOrDefaultAsync(f => f.Id == id);
+            if (currentFridge != null)
+            {
+                if (_db.FridgeUsers.Where(fu => fu.AppUser.Id == appUser.Id).FirstOrDefault() == null || _db.FridgeUsers.Where(fu => fu.AppUser.Id == appUser.Id).FirstOrDefault().IsOwner == false)
+                    return Unauthorized();
+
+                var currentFridgeIngredients = await _db.FridgeIngredients.Where(ri => ri.FridgeId == id).ToListAsync();
+                _db.FridgeIngredients.RemoveRange(currentFridgeIngredients);
+
+                _db.Fridges.Remove(currentFridge);
+                await _db.SaveChangesAsync();
+
+                return Ok();
+            }
+            else
+                return NotFound();
         }
 
     }
