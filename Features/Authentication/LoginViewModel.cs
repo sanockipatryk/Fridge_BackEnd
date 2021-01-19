@@ -12,8 +12,5 @@ namespace Fridge_BackEnd.Features.Authentication
         public string Email { get; set; }
         [Required]
         public string Password { get; set; }
-        [Required]
-        [Compare(nameof(Password))]
-        public string ConfirmPassword { get; set; }
     }
 }

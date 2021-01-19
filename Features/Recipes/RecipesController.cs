@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Fridge_BackEnd.Data;
 using Fridge_BackEnd.Data.Entities;
+using Fridge_BackEnd.Features.RecipeIngredients;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +36,7 @@ namespace Fridge_BackEnd.Features.Recipes
                 DateCreated = i.DateCreated,
                 DateModified = i.DateModified,
                 CookingTime = i.CookingTime,
-                Ingredients = i.Ingredients.Select(ing => new RecipeIngredients.RecipeIngredientsListViewModel
+                Ingredients = i.Ingredients.OrderBy(i => i.Quantity).Select(ing => new RecipeIngredients.RecipeIngredientsListViewModel
                 {
                     IngredientId = ing.IngredientId,
                     CategoryId = ing.Ingredient.CategoryId,
@@ -136,6 +137,104 @@ namespace Fridge_BackEnd.Features.Recipes
             }
             else
                 return NotFound();
+        }
+
+        [HttpPost("checkEnoughIngredients")]
+        [Authorize]
+        public async Task<IActionResult> CheckEnoughIngredients(UseRecipeViewModel model)
+        {
+            var appUser = await _db.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            var currentRecipe = await _db.Recipes.Include(r => r.Ingredients).ThenInclude(i => i.Ingredient).ThenInclude(i => i.IngredientCategory).FirstOrDefaultAsync(r => r.Id == model.RecipeId);
+            var currentFridge = await _db.Fridges.Include(f => f.Ingredients).Include(f => f.Users).FirstOrDefaultAsync(r => r.Id == model.FridgeId);
+
+            if (currentFridge.Users.Where(u => u.UserId == appUser.Id && u.InvitationAccepted == true) != null)
+            {
+                if (currentRecipe != null && currentFridge != null)
+                {
+                    if (appUser.Id != currentRecipe.UserId)
+                        return Unauthorized();
+
+                    var enoughIngredients = new List<RecipeIngredientsTextViewModel>();
+                    var notEnoughIngredients = new List<RecipeIngredientsTextViewModel>();
+                    var currentFridgeIngredient = new FridgeIngredient();
+                    foreach (var ri in currentRecipe.Ingredients)
+                    {
+                        currentFridgeIngredient = currentFridge.Ingredients.Find(i => i.IngredientId == ri.IngredientId);
+                        if (currentFridgeIngredient != null)
+                        {
+                            if (currentFridgeIngredient.Quantity >= ri.Quantity)
+                                enoughIngredients.Add(new RecipeIngredientsTextViewModel
+                                {
+                                    Ingredient = ri.Ingredient.Name,
+                                    Category = ri.Ingredient.IngredientCategory.Name,
+                                    Quantity = ri.Quantity
+                                });
+                            else
+                            {
+                                notEnoughIngredients.Add(new RecipeIngredientsTextViewModel
+                                {
+                                    Ingredient = ri.Ingredient.Name,
+                                    Category = ri.Ingredient.IngredientCategory.Name,
+                                    Quantity = ri.Quantity - currentFridgeIngredient.Quantity
+                                });
+                            }
+                        }
+                        else
+                            notEnoughIngredients.Add(new RecipeIngredientsTextViewModel
+                            {
+                                Ingredient = ri.Ingredient.Name,
+                                Category = ri.Ingredient.IngredientCategory.Name,
+                                Quantity = ri.Quantity
+                            });
+                    }
+                    var sufficientIngredients = new SufficientIngredientsViewModel
+                    {
+                        RecipeId = currentRecipe.Id,
+                        FridgeId = currentFridge.Id,
+                        EnoughIngredients = enoughIngredients.OrderByDescending(i => i.Quantity).ToList(),
+                        NotEnoughIngredients = notEnoughIngredients.OrderByDescending(i => i.Quantity).ToList(),
+                        CanUse = notEnoughIngredients.Count() == 0
+                    };
+
+                    return Ok(sufficientIngredients);
+                }
+                return NotFound();
+            }
+            return Unauthorized();
+        }
+
+        [HttpPut("useRecipe")]
+        [Authorize]
+        public async Task<IActionResult> UseRecipe(UseRecipeViewModel model)
+        {
+            var appUser = await _db.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            var currentRecipe = await _db.Recipes.Include(r => r.Ingredients).ThenInclude(i => i.Ingredient).ThenInclude(i => i.IngredientCategory).FirstOrDefaultAsync(r => r.Id == model.RecipeId);
+            var currentFridge = await _db.Fridges.Include(f => f.Ingredients).Include(f => f.Users).FirstOrDefaultAsync(r => r.Id == model.FridgeId);
+
+            if (currentFridge.Users.Where(u => u.UserId == appUser.Id && u.InvitationAccepted == true) != null)
+            {
+                if (currentRecipe != null && currentFridge != null)
+                {
+                    if (appUser.Id != currentRecipe.UserId)
+                        return Unauthorized();
+
+                    foreach (var fi in currentFridge.Ingredients)
+                    {
+                        var recipeIngredient = currentRecipe.Ingredients.Where(i => i.IngredientId == fi.IngredientId);
+                        if(recipeIngredient.Count() > 0 ) { 
+                        fi.Quantity = fi.Quantity - recipeIngredient.Single().Quantity;
+                        if (fi.Quantity > 0)
+                            _db.Update(fi);
+                        else _db.Remove(fi);
+                        }
+                    }
+
+                    await _db.SaveChangesAsync();
+                    return Ok();
+                }
+                return NotFound();
+            }
+            return Unauthorized();
         }
     }
 }

@@ -100,15 +100,14 @@ namespace Fridge_BackEnd
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v0.1/swagger.json", "Fridge API v0.1");
+
+                    c.RoutePrefix = string.Empty;
+                });
             }
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v0.1/swagger.json", "Fridge API v0.1");
-
-                c.RoutePrefix = string.Empty;
-            });
 
             app.UseHttpsRedirection();
 

@@ -17,7 +17,10 @@ namespace Fridge_BackEnd.Data.Entities
         public int FridgeId { get; set; }
         [Required]
         public bool IsOwner { get; set; }
-
+        [Required]
+        public bool InvitationPending { get; set; }
+        [Required]
+        public bool InvitationAccepted { get; set; }
         [Required]
         public AppUser AppUser { get; set; }
         [Required]
