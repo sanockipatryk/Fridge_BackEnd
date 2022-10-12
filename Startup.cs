@@ -1,21 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Fridge_BackEnd.Data;
 using Fridge_BackEnd.Data.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -33,7 +27,7 @@ namespace Fridge_BackEnd
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<FridgeContext>(options =>
-            options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
+            options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), options => options.EnableRetryOnFailure()));
 
             services.AddIdentity<AppUser, IdentityRole<int>>(options =>
             {
@@ -96,6 +90,7 @@ namespace Fridge_BackEnd
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             app.UseCors(x =>
                 x.AllowAnyOrigin()
                 .AllowAnyMethod()
@@ -105,15 +100,14 @@ namespace Fridge_BackEnd
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v0.1/swagger.json", "Fridge API v0.1");
+
+                    c.RoutePrefix = string.Empty;
+                });
             }
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v0.1/swagger.json", "Fridge API v0.1");
-
-                c.RoutePrefix = string.Empty;
-            });
 
             app.UseHttpsRedirection();
 

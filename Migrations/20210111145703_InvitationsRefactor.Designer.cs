@@ -3,14 +3,16 @@ using System;
 using Fridge_BackEnd.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Fridge_BackEnd.Migrations
 {
     [DbContext(typeof(FridgeContext))]
-    partial class FridgeContextModelSnapshot : ModelSnapshot
+    [Migration("20210111145703_InvitationsRefactor")]
+    partial class InvitationsRefactor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fridge_BackEnd.Migrations
 {
     [DbContext(typeof(FridgeContext))]
-    [Migration("20201122163607_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20201124205417_IngredientCategoriesData")]
+    partial class IngredientCategoriesData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -193,9 +193,130 @@ namespace Fridge_BackEnd.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
                     b.HasKey("Id");
 
                     b.ToTable("IngredientCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Herbs and Spices"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Vegetables"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Fruits"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Nuts"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Cereals and cereal products"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Pulses"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Teas"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Gourds"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Coffee and coffee products"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Soy"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Cocoa and cocoa products"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "Beverages"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "Aquatic foods"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Name = "Animal foods"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Name = "Milk and milk products"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Name = "Eggs"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Name = "Confectioneries"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Name = "Baking goods"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Name = "Dishes"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Name = "Snack foods"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Name = "Baby foods"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Name = "Unclassified"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Name = "Fats and oils"
+                        });
                 });
 
             modelBuilder.Entity("Fridge_BackEnd.Data.Entities.Recipe", b =>

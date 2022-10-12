@@ -3,14 +3,16 @@ using System;
 using Fridge_BackEnd.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Fridge_BackEnd.Migrations
 {
     [DbContext(typeof(FridgeContext))]
-    partial class FridgeContextModelSnapshot : ModelSnapshot
+    [Migration("20201124205430_IngredientsData")]
+    partial class IngredientsData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -146,12 +148,6 @@ namespace Fridge_BackEnd.Migrations
 
                     b.Property<int>("FridgeId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("InvitationAccepted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("InvitationPending")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsOwner")
                         .HasColumnType("tinyint(1)");
